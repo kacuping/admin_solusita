@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 
+
 Route::get('/', [App\Http\Controllers\DashboardController::class, 'index'])
     ->middleware('auth')
     ->name('dashboard');
@@ -48,4 +49,20 @@ Route::middleware('auth')->group(function () {
         ->names('payment-methods');
 
     Route::get('/settings', [App\Http\Controllers\SettingController::class, 'index'])->name('settings.index');
+});
+
+Route::get('/fix-storage', function () {
+    $target = __DIR__ . '/../storage/app/public'; 
+    $shortcut = __DIR__ . '/../storage_public'; // Nama sementara biar gak bentrok
+    
+    // Di server hosting, pathnya harus absolut
+    $target = base_path('storage/app/public');
+    $shortcut = public_path('storage'); // public_path() di Opsi 2 mengarah ke Root Project
+    
+    if(file_exists($shortcut)) {
+        return "Folder 'storage' sudah ada di root. Coba hapus dulu lewat File Manager jika masih error.";
+    }
+    
+    symlink($target, $shortcut);
+    return "Symlink berhasil dibuat! Target: $target -> Shortcut: $shortcut";
 });
