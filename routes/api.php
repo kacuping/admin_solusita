@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\CleanerController;
+use App\Http\Controllers\Api\TransactionController;
 
 // Public Routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -31,4 +32,5 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::post('/payment/create', [PaymentController::class, 'createTransaction']);
     Route::apiResource('users', UserController::class);
+    Route::apiResource('transactions', TransactionController::class)->only(['index', 'show']);
 });
