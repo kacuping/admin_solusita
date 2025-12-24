@@ -50,4 +50,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function cleanerTransactions()
+    {
+        return $this->hasMany(Transaction::class, 'cleaner_id');
+    }
 }
