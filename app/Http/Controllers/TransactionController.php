@@ -20,16 +20,15 @@ class TransactionController extends Controller
                 'cancellation_reason' => 'Cancelled By System'
             ]);
 
-        // Today's Transactions
+        // Upcoming & Today Transactions (Hari ini dan Masa Depan)
         $todayTransactions = Transaction::with(['user', 'cleaner', 'service'])
-            ->whereDate('transaction_date', Carbon::today())
-            ->latest()
+            ->whereDate('transaction_date', '>=', Carbon::today()) // Ubah jadi >= Today
+            ->orderBy('transaction_date', 'asc') // Urutkan dari yang terdekat
             ->paginate(10, ['*'], 'today_page');
 
-        // History Transactions (Past 30 days) with Filters
+        // History Transactions (Past Transactions)
         $historyQuery = Transaction::with(['user', 'cleaner', 'service'])
-            ->whereDate('transaction_date', '<', Carbon::today())
-            ->whereDate('transaction_date', '>=', Carbon::today()->subDays(30));
+            ->whereDate('transaction_date', '<', Carbon::today()); // Hanya masa lalu
 
         // Filter by Date
         if ($request->filled('filter_date')) {
