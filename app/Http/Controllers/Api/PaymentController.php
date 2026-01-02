@@ -33,9 +33,9 @@ class PaymentController extends Controller
     {
         $request->validate([
             'service_id' => 'required|exists:services,id',
-            'cleaner_id' => 'nullable|exists:users,id', // Changed from required to nullable
+            'cleaner_id' => 'nullable|exists:users,id',
             'transaction_date' => 'required|date',
-            'payment_gateway' => 'nullable|in:midtrans,bri',
+            'payment_gateway' => 'nullable|in:midtrans,bri,cash',
         ]);
 
         try {
@@ -49,7 +49,7 @@ class PaymentController extends Controller
             $transaction = Transaction::create([
                 'code' => $code,
                 'user_id' => $user->id,
-                'cleaner_id' => $request->cleaner_id, // Can be null now
+                'cleaner_id' => $request->cleaner_id, 
                 'service_id' => $request->service_id,
                 'transaction_date' => $request->transaction_date,
                 'total' => $service->price,
@@ -61,7 +61,14 @@ class PaymentController extends Controller
             $paymentToken = null;
             $paymentType = null;
 
-            if ($paymentGateway === 'bri') {
+            if ($paymentGateway === 'cash') {
+                // Payment Method: Cash
+                $paymentType = 'cash';
+                $transaction->update([
+                    'payment_type' => 'cash',
+                    'status' => 'pending', // Tetap pending sampai dibayar di tempat
+                ]);
+            } elseif ($paymentGateway === 'bri') {
                 // BRI Direct Integration
                 $briResponse = $this->briService->createVirtualAccount(
                     $transaction->code, 
