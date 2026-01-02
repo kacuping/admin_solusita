@@ -33,26 +33,26 @@ class PaymentController extends Controller
     {
         $request->validate([
             'service_id' => 'required|exists:services,id',
-            'cleaner_id' => 'required|exists:users,id',
+            'cleaner_id' => 'nullable|exists:users,id', // Changed from required to nullable
             'transaction_date' => 'required|date',
-            'payment_gateway' => 'nullable|in:midtrans,bri', // Option to choose gateway
+            'payment_gateway' => 'nullable|in:midtrans,bri',
         ]);
 
         try {
             DB::beginTransaction();
 
             $service = Service::findOrFail($request->service_id);
-            $user = auth()->user(); // Assuming authenticated via Sanctum
+            $user = auth()->user();
 
             // Create Transaction
             $code = 'TRX-' . mt_rand(100000, 999999);
             $transaction = Transaction::create([
                 'code' => $code,
                 'user_id' => $user->id,
-                'cleaner_id' => $request->cleaner_id,
+                'cleaner_id' => $request->cleaner_id, // Can be null now
                 'service_id' => $request->service_id,
                 'transaction_date' => $request->transaction_date,
-                'total' => $service->price, // Assuming service has price
+                'total' => $service->price,
                 'status' => 'pending',
             ]);
 
