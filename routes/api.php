@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\CleanerController;
 use App\Http\Controllers\Api\TransactionController;
+use App\Http\Controllers\Api\PaymentMethodController;
 
 // Public Routes
 Route::post('/register', [AuthController::class, 'register']);
@@ -22,6 +23,7 @@ Route::get('/services', [ServiceController::class, 'index']);
 Route::get('/services/{id}', [ServiceController::class, 'show']);
 Route::get('/cleaners', [CleanerController::class, 'index']);
 Route::get('/cleaners/{id}', [CleanerController::class, 'show']);
+Route::get('/payment-methods', [PaymentMethodController::class, 'index']);
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
