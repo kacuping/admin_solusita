@@ -28,7 +28,20 @@ Route::get('/payment-methods', [PaymentMethodController::class, 'index']);
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
-        return $request->user();
+        $user = $request->user();
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'role' => $user->role,
+                'address' => $user->address,
+                'avatar' => $user->avatar,
+                'avatar_url' => $user->avatar ? asset('storage/' . $user->avatar) : null,
+            ],
+        ]);
     });
     Route::post('/logout', [AuthController::class, 'logout']);
     
