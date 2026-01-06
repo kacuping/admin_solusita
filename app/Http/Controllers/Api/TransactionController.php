@@ -53,4 +53,38 @@ class TransactionController extends Controller
             'data' => $transaction
         ]);
     }
+
+    public function assign(Request $request, string $id)
+    {
+        $user = $request->user();
+        if ($user->role !== 'admin') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        $request->validate([
+            'cleaner_id' => 'required|exists:users,id',
+        ]);
+
+        $transaction = Transaction::find($id);
+        if (!$transaction) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Transaction not found'
+            ], 404);
+        }
+
+        $transaction->update([
+            'cleaner_id' => $request->cleaner_id,
+            'status' => 'process'
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Cleaner assigned',
+            'data' => $transaction->fresh(['service', 'cleaner'])
+        ]);
+    }
 }

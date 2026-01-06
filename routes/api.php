@@ -48,4 +48,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/payment/create', [PaymentController::class, 'createTransaction']);
     Route::apiResource('users', UserController::class);
     Route::apiResource('transactions', TransactionController::class)->only(['index', 'show']);
+    Route::post('/transactions/{id}/assign', [TransactionController::class, 'assign']);
 });
