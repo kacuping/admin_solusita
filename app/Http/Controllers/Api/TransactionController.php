@@ -31,9 +31,9 @@ class TransactionController extends Controller
     /**
      * Display the specified transaction detail.
      */
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
-        $user = auth()->user();
+        $user = $request->user();
 
         // Find transaction ensuring it belongs to the user
         $transaction = Transaction::where('user_id', $user->id)
