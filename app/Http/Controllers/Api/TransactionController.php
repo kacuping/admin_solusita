@@ -16,11 +16,21 @@ class TransactionController extends Controller
         // Get logged in user
         $user = $request->user();
 
-        // Get transactions for this user
-        $transactions = Transaction::where('user_id', $user->id)
-            ->with(['service', 'cleaner']) // Eager load relations
-            ->latest('created_at')
-            ->paginate(10); // Pagination
+        $query = Transaction::with(['service', 'cleaner']);
+
+        // Filter based on role
+        if ($user->role === 'cleaner') {
+            // Cleaner sees tasks assigned to them
+            $query->where('cleaner_id', $user->id);
+            // Optional: Sort by transaction date for schedule view
+            $query->orderBy('transaction_date', 'asc'); 
+        } else {
+            // Customer sees their own orders
+            $query->where('user_id', $user->id);
+            $query->latest('created_at');
+        }
+
+        $transactions = $query->paginate(10);
 
         return response()->json([
             'status' => 'success',
@@ -35,11 +45,16 @@ class TransactionController extends Controller
     {
         $user = $request->user();
 
-        // Find transaction ensuring it belongs to the user
-        $transaction = Transaction::where('user_id', $user->id)
-            ->where('id', $id)
-            ->with(['service', 'cleaner'])
-            ->first();
+        $query = Transaction::with(['service', 'cleaner'])->where('id', $id);
+
+        // Security check: Ensure user owns the transaction or is the assigned cleaner
+        if ($user->role === 'cleaner') {
+            $query->where('cleaner_id', $user->id);
+        } elseif ($user->role !== 'admin') {
+            $query->where('user_id', $user->id);
+        }
+
+        $transaction = $query->first();
 
         if (!$transaction) {
             return response()->json([
