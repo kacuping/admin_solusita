@@ -102,4 +102,42 @@ class TransactionController extends Controller
             'data' => $transaction->fresh(['service', 'cleaner'])
         ]);
     }
+
+    public function complete(Request $request, string $id)
+    {
+        $user = $request->user();
+
+        $transaction = Transaction::find($id);
+        if (!$transaction) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Transaction not found'
+            ], 404);
+        }
+
+        // Only admin or assigned cleaner can mark completed
+        if ($user->role === 'cleaner') {
+            if ($transaction->cleaner_id !== $user->id) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized'
+                ], 403);
+            }
+        } elseif ($user->role !== 'admin') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        $transaction->update([
+            'status' => 'completed'
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Transaction completed',
+            'data' => $transaction->fresh(['service', 'cleaner'])
+        ]);
+    }
 }
