@@ -140,4 +140,54 @@ class TransactionController extends Controller
             'data' => $transaction->fresh(['service', 'cleaner'])
         ]);
     }
+
+    public function rate(Request $request, string $id)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'rating' => 'required|numeric|min:1|max:5',
+            'review' => 'nullable|string|max:500',
+        ]);
+
+        $transaction = Transaction::find($id);
+        if (!$transaction) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Transaction not found'
+            ], 404);
+        }
+
+        if ($transaction->user_id !== $user->id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        if ($transaction->status !== 'completed') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Transaction not completed'
+            ], 400);
+        }
+
+        if (!is_null($transaction->rating)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Transaction already rated'
+            ], 400);
+        }
+
+        $transaction->update([
+            'rating' => $request->rating,
+            'review' => $request->review,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Rating submitted',
+            'data' => $transaction->fresh(['service', 'cleaner'])
+        ]);
+    }
 }
