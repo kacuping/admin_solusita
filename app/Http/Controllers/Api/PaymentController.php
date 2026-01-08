@@ -45,7 +45,7 @@ class PaymentController extends Controller
             DB::beginTransaction();
 
             $service = Service::findOrFail($request->service_id);
-            $user = auth()->user();
+            $user = $request->user();
 
             // Create Transaction
             $code = 'TRX-' . mt_rand(100000, 999999);
