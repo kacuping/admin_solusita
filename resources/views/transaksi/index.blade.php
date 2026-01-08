@@ -17,6 +17,7 @@
                             <th>#</th>
                             <th>Kode</th>
                             <th>Pelanggan</th>
+                            <th>Alamat</th>
                             <th>Layanan</th>
                             <th>Tgl Order</th>
                             <th>Status</th>
@@ -31,6 +32,7 @@
                                 <td>{{ $todayTransactions->firstItem() + $loop->index }}</td>
                                 <td>{{ $transaction->code }}</td>
                                 <td>{{ $transaction->user->name ?? '-' }}</td>
+                                <td>{{ $transaction->order_address ?? ($transaction->user->address ?? '-') }}</td>
                                 <td>{{ $transaction->service->name ?? '-' }}</td>
                                 <td>{{ date('d M Y', strtotime($transaction->transaction_date)) }}</td>
                                 <td>
@@ -48,7 +50,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center">Belum ada transaksi hari ini</td>
+                                <td colspan="10" class="text-center">Belum ada transaksi hari ini</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -137,6 +139,7 @@
                             <th>#</th>
                             <th>Kode</th>
                             <th>Pelanggan</th>
+                            <th>Alamat</th>
                             <th>Layanan</th>
                             <th>Tgl Order</th>
                             <th>Status</th>
@@ -151,6 +154,7 @@
                                 <td>{{ $historyTransactions->firstItem() + $loop->index }}</td>
                                 <td>{{ $transaction->code }}</td>
                                 <td>{{ $transaction->user->name ?? '-' }}</td>
+                                <td>{{ $transaction->order_address ?? ($transaction->user->address ?? '-') }}</td>
                                 <td>{{ $transaction->service->name ?? '-' }}</td>
                                 <td>{{ date('d M Y', strtotime($transaction->transaction_date)) }}</td>
                                 <td>
@@ -168,7 +172,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center">Belum ada riwayat transaksi</td>
+                                <td colspan="10" class="text-center">Belum ada riwayat transaksi</td>
                             </tr>
                         @endforelse
                     </tbody>
