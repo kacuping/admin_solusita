@@ -214,6 +214,14 @@
                                 <td id="detail-status"></td>
                             </tr>
                             <tr>
+                                <th>Alamat</th>
+                                <td id="detail-address"></td>
+                            </tr>
+                            <tr>
+                                <th>Koordinat</th>
+                                <td id="detail-coords"></td>
+                            </tr>
+                            <tr>
                                 <th>Cleaner</th>
                                 <td id="detail-cleaner-container">
                                     <div id="cleaner-display" style="display:none;"></div>
@@ -310,6 +318,12 @@
                         $('#detail-status').text(statusLabel);
                         $('#detail-total').text('Rp ' + new Intl.NumberFormat('id-ID').format(
                             response.total));
+
+                        $('#detail-address').text(response.order_address ? response.order_address : '-');
+                        let coords = (response.order_lat && response.order_lng)
+                            ? `${response.order_lat}, ${response.order_lng}`
+                            : '-';
+                        $('#detail-coords').text(coords);
 
                         // Logic Cleaner Display
                         if (response.cleaner) {

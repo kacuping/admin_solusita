@@ -36,6 +36,9 @@ class PaymentController extends Controller
             'cleaner_id' => 'nullable|exists:users,id',
             'transaction_date' => 'required|date',
             'payment_gateway' => 'nullable|in:midtrans,bri,cash',
+            'address' => 'required|string|max:255',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
         ]);
 
         try {
@@ -52,6 +55,9 @@ class PaymentController extends Controller
                 'cleaner_id' => $request->cleaner_id, 
                 'service_id' => $request->service_id,
                 'transaction_date' => $request->transaction_date,
+                'order_address' => $request->address,
+                'order_lat' => $request->latitude,
+                'order_lng' => $request->longitude,
                 'total' => $service->price,
                 'status' => 'pending',
             ]);
@@ -100,6 +106,9 @@ class PaymentController extends Controller
                         'first_name' => $user->name,
                         'email' => $user->email,
                         'phone' => $user->phone,
+                        'billing_address' => [
+                            'address' => $request->address,
+                        ],
                     ],
                     'item_details' => [
                         [
