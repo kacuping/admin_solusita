@@ -8,9 +8,9 @@ class FcmService
 {
     public function sendToToken(string $token, string $title, string $body, array $data = []): void
     {
-        $serverKey = config('services.fcm.server_key', env('FCM_SERVER_KEY'));
+        $serverKey = config('services.fcm.server_key');
         if (!$serverKey) {
-            return ['success' => false, 'message' => 'FCM server key not configured'];
+            return;
         }
 
         $payload = [
@@ -23,11 +23,11 @@ class FcmService
             'priority' => 'high',
         ];
 
-        $response = Http::withHeaders([
+        Http::withHeaders([
             'Authorization' => 'key=' . $serverKey,
             'Content-Type' => 'application/json',
         ])->post('https://fcm.googleapis.com/fcm/send', $payload);
         
-        // Response handling intentionally omitted
+        
     }
 }
