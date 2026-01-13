@@ -35,7 +35,7 @@ class PaymentController extends Controller
             'service_id' => 'required|exists:services,id',
             'cleaner_id' => 'nullable|exists:users,id',
             'transaction_date' => 'required|date',
-            'payment_gateway' => 'nullable|in:midtrans,bri,cash',
+            'payment_gateway' => 'nullable|in:midtrans,bri,cash,transfer',
             'address' => 'required|string|max:255',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
@@ -73,6 +73,13 @@ class PaymentController extends Controller
                 $transaction->update([
                     'payment_type' => 'cash',
                     'status' => 'pending', // Tetap pending sampai dibayar di tempat
+                ]);
+            } elseif ($paymentGateway === 'transfer') {
+                // Payment Method: Manual Transfer
+                $paymentType = 'transfer';
+                $transaction->update([
+                    'payment_type' => 'transfer',
+                    'status' => 'pending', // Pending sampai upload bukti dan dikonfirmasi
                 ]);
             } elseif ($paymentGateway === 'bri') {
                 // BRI Direct Integration

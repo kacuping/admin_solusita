@@ -7,8 +7,66 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Services\FcmService;
 
+use Illuminate\Support\Facades\Storage;
+
 class TransactionController extends Controller
 {
+    public function uploadProof(Request $request, string $id)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'payment_proof' => 'required|image|max:2048', // Max 2MB
+        ]);
+
+        $transaction = Transaction::find($id);
+        if (!$transaction) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Transaction not found'
+            ], 404);
+        }
+
+        if ($transaction->user_id !== $user->id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        if ($transaction->payment_type !== 'transfer') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Upload proof is only for transfer payment type'
+            ], 400);
+        }
+
+        if ($request->hasFile('payment_proof')) {
+            // Delete old proof if exists
+            if ($transaction->payment_proof && Storage::disk('public')->exists($transaction->payment_proof)) {
+                Storage::disk('public')->delete($transaction->payment_proof);
+            }
+            
+            $path = $request->file('payment_proof')->store('payment_proofs', 'public');
+            
+            $transaction->update([
+                'payment_proof' => $path,
+                // Status tetap pending, menunggu admin assign/confirm
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Payment proof uploaded successfully',
+                'data' => $transaction->fresh()
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'File not found'
+        ], 400);
+    }
+
     /**
      * Display a listing of the user's transactions (History).
      */
