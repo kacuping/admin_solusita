@@ -287,6 +287,9 @@
 @push('js-specific')
     <script>
         $(document).ready(function() {
+            // Fix SweetAlert2 input focus issue inside Bootstrap Modal
+            $.fn.modal.Constructor.prototype._enforceFocus = function() {};
+
             // Pindahkan modal ke body untuk menghindari masalah z-index/backdrop
             $('#transactionDetailModal').appendTo("body");
 
