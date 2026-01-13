@@ -254,6 +254,18 @@
                                 <th>Total</th>
                                 <td id="detail-total"></td>
                             </tr>
+                            <tr>
+                                <th>Metode Pembayaran</th>
+                                <td id="detail-payment-type"></td>
+                            </tr>
+                            <tr id="row-payment-proof" style="display:none;">
+                                <th>Bukti Transfer</th>
+                                <td>
+                                    <a href="#" id="link-payment-proof" target="_blank">
+                                        <img id="img-payment-proof" src="" alt="Bukti Transfer" style="max-width: 200px; max-height: 200px;" class="img-thumbnail">
+                                    </a>
+                                </td>
+                            </tr>
                         </table>
                     </div>
                 </div>
@@ -324,6 +336,20 @@
                         $('#detail-status').text(statusLabel);
                         $('#detail-total').text('Rp ' + new Intl.NumberFormat('id-ID').format(
                             response.total));
+
+                        // Payment Info
+                        let paymentType = response.payment_type ? response.payment_type.toUpperCase() : '-';
+                        if (paymentType === 'BRI_VA') paymentType = 'BRI Virtual Account';
+                        $('#detail-payment-type').text(paymentType);
+
+                        if (response.payment_proof) {
+                            let proofUrl = "{{ asset('storage') }}/" + response.payment_proof;
+                            $('#img-payment-proof').attr('src', proofUrl);
+                            $('#link-payment-proof').attr('href', proofUrl);
+                            $('#row-payment-proof').show();
+                        } else {
+                            $('#row-payment-proof').hide();
+                        }
 
                         $('#detail-address').text(response.order_address ? response.order_address : '-');
                         let coords = (response.order_lat && response.order_lng)
