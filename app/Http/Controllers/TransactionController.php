@@ -81,6 +81,19 @@ class TransactionController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function complete(Transaction $transaction)
+    {
+        if ($transaction->status !== 'process') {
+            return response()->json(['error' => 'Hanya transaksi berstatus proses yang dapat diselesaikan'], 400);
+        }
+
+        $transaction->update([
+            'status' => 'completed'
+        ]);
+        
+        return response()->json(['success' => true]);
+    }
+
     public function cancel(Request $request, Transaction $transaction)
     {
         if (!in_array($transaction->status, ['pending', 'process'])) {

@@ -258,6 +258,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="btn-complete-trx" style="display:none;">Selesaikan Transaksi</button>
                     <button type="button" class="btn btn-danger" id="btn-cancel-trx" style="display:none;">Batalkan
                         Transaksi</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
@@ -297,6 +298,7 @@
 
                 // Reset cancel button
                 $('#btn-cancel-trx').hide();
+                $('#btn-complete-trx').hide();
 
                 $('#transactionDetailModal').modal('show');
 
@@ -344,6 +346,11 @@
                         if (response.status === 'pending' || response.status === 'process') {
                             $('#btn-cancel-trx').show();
                         }
+
+                        // Logic Complete Button
+                        if (response.status === 'process') {
+                            $('#btn-complete-trx').show();
+                        }
                     },
                     error: function() {
                         Swal.fire('Error', 'Gagal mengambil data transaksi', 'error');
@@ -378,6 +385,51 @@
                     },
                     error: function(xhr) {
                         Swal.fire('Error', 'Gagal menugaskan cleaner', 'error');
+                    }
+                });
+            });
+
+            // Handle Complete Transaction
+            $('#btn-complete-trx').click(function() {
+                if (!currentTransactionId) return;
+
+                Swal.fire({
+                    title: 'Selesaikan Transaksi?',
+                    text: "Pastikan pekerjaan telah selesai sebelum mengubah status",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, Selesaikan',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var url = "{{ route('transaksi.complete', ':id') }}".replace(':id', currentTransactionId);
+
+                        $.ajax({
+                            url: url,
+                            type: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}'
+                            },
+                            success: function(response) {
+                                $('#transactionDetailModal').modal('hide');
+                                Swal.fire(
+                                    'Berhasil!',
+                                    'Transaksi telah diselesaikan.',
+                                    'success'
+                                ).then(() => {
+                                    location.reload();
+                                });
+                            },
+                            error: function(xhr) {
+                                var msg = 'Gagal menyelesaikan transaksi';
+                                if(xhr.responseJSON && xhr.responseJSON.error) {
+                                    msg = xhr.responseJSON.error;
+                                }
+                                Swal.fire('Error', msg, 'error');
+                            }
+                        });
                     }
                 });
             });

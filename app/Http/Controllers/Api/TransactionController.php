@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use App\Services\FcmService;
 
 class TransactionController extends Controller
 {
@@ -95,11 +96,27 @@ class TransactionController extends Controller
             'cleaner_id' => $request->cleaner_id,
             'status' => 'process'
         ]);
+        
+        $transaction->load(['user', 'cleaner']);
+
+        $token = $transaction->user->device_token ?? null;
+        if ($token) {
+            $fcm = app(FcmService::class);
+            $fcm->sendToToken(
+                $token,
+                'Pesanan Diproses',
+                'Cleaner ditugaskan: ' . ($transaction->cleaner->name ?? '-'),
+                [
+                    'transaction_id' => $transaction->id,
+                    'status' => 'process'
+                ]
+            );
+        }
 
         return response()->json([
             'status' => 'success',
             'message' => 'Cleaner assigned',
-            'data' => $transaction->fresh(['service', 'cleaner'])
+            'data' => $transaction
         ]);
     }
 

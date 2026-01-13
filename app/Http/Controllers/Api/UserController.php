@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -151,6 +152,23 @@ class UserController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'User deleted successfully'
+        ]);
+    }
+
+    public function saveDeviceToken(Request $request)
+    {
+        $request->validate([
+            'device_token' => 'required|string'
+        ]);
+
+        $user = $request->user();
+        $user->update([
+            'device_token' => $request->device_token
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Device token saved',
         ]);
     }
 }

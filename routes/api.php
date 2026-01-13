@@ -47,6 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::post('/payment/create', [PaymentController::class, 'createTransaction']);
     Route::apiResource('users', UserController::class);
+    Route::post('/user/device-token', [UserController::class, 'saveDeviceToken']);
     Route::apiResource('transactions', TransactionController::class)->only(['index', 'show']);
     Route::post('/transactions/{id}/assign', [TransactionController::class, 'assign']);
     Route::post('/transactions/{id}/complete', [TransactionController::class, 'complete']);

@@ -18,6 +18,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/transaksi', 'index')->name('transaksi.index');
         Route::get('/transaksi/{transaction}', 'show')->name('transaksi.show');
         Route::post('/transaksi/{transaction}/assign', 'assign')->name('transaksi.assign');
+        Route::post('/transaksi/{transaction}/complete', 'complete')->name('transaksi.complete');
         Route::post('/transaksi/{transaction}/cancel', 'cancel')->name('transaksi.cancel');
     });
 
