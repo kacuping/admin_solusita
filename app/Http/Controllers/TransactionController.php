@@ -23,7 +23,7 @@ class TransactionController extends Controller
         // Upcoming & Today Transactions (Hari ini dan Masa Depan)
         $todayTransactions = Transaction::with(['user', 'cleaner', 'service'])
             ->whereDate('transaction_date', '>=', Carbon::today()) // Ubah jadi >= Today
-            ->orderBy('transaction_date', 'asc') // Urutkan dari yang terdekat
+            ->latest() // Urutkan dari yang paling baru dibuat
             ->paginate(10, ['*'], 'today_page');
 
         // History Transactions (Past Transactions)
@@ -50,7 +50,7 @@ class TransactionController extends Controller
             $historyQuery->where('cleaner_id', $request->filter_cleaner);
         }
 
-        $historyTransactions = $historyQuery->latest('transaction_date')
+        $historyTransactions = $historyQuery->latest()
             ->paginate(10, ['*'], 'history_page');
             
         // Append query parameters to pagination links
