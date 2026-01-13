@@ -17,7 +17,7 @@ class TransactionController extends Controller
             ->whereDate('transaction_date', '<', Carbon::today())
             ->update([
                 'status' => 'cancelled',
-                'cancellation_reason' => 'Cancelled By System'
+                'cancellation_reason' => 'System Cancelled: Expired'
             ]);
 
         // Upcoming & Today Transactions (Hari ini dan Masa Depan)
@@ -106,7 +106,7 @@ class TransactionController extends Controller
 
         $transaction->update([
             'status' => 'cancelled',
-            'cancellation_reason' => $request->reason
+            'cancellation_reason' => 'Admin Cancelled: ' . $request->reason
         ]);
         
         return response()->json(['success' => true]);

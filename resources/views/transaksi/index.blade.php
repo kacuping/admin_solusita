@@ -221,6 +221,10 @@
                                 <th>Alamat</th>
                                 <td id="detail-address"></td>
                             </tr>
+                            <tr id="row-cancellation-reason" style="display:none;">
+                                <th>Alasan Pembatalan</th>
+                                <td id="detail-cancellation-reason" class="text-danger font-weight-bold"></td>
+                            </tr>
                             <tr>
                                 <th>Koordinat</th>
                                 <td id="detail-coords"></td>
@@ -356,6 +360,24 @@
                             ? `${response.order_lat}, ${response.order_lng}`
                             : '-';
                         $('#detail-coords').text(coords);
+
+                        // Cancellation Info
+                        if (response.status === 'cancelled') {
+                            $('#row-cancellation-reason').show();
+                            let reason = response.cancellation_reason || '-';
+                            $('#detail-cancellation-reason').text(reason);
+                            
+                            // Adjust status label based on reason
+                            if (reason.includes('User Cancelled')) {
+                                $('#detail-status').text('User Cancelled');
+                            } else if (reason.includes('Admin Cancelled')) {
+                                $('#detail-status').text('Admin Cancelled');
+                            } else if (reason.includes('System Cancelled')) {
+                                $('#detail-status').text('System Cancelled');
+                            }
+                        } else {
+                            $('#row-cancellation-reason').hide();
+                        }
 
                         // Logic Cleaner Display
                         if (response.cleaner) {

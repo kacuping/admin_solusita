@@ -250,7 +250,7 @@ class TransactionController extends Controller
 
         $transaction->update([
             'status' => 'cancelled',
-            'cancellation_reason' => $request->reason
+            'cancellation_reason' => 'User Cancelled: ' . $request->reason
         ]);
 
         return response()->json([
