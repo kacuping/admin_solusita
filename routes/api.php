@@ -51,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('transactions', TransactionController::class)->only(['index', 'show']);
     Route::post('/transactions/{id}/assign', [TransactionController::class, 'assign']);
     Route::post('/transactions/{id}/complete', [TransactionController::class, 'complete']);
+    Route::post('/transactions/{id}/cancel', [TransactionController::class, 'cancel']);
     Route::post('/transactions/{id}/rating', [TransactionController::class, 'rate']);
     Route::post('/transactions/{id}/upload-proof', [TransactionController::class, 'uploadProof']);
 });

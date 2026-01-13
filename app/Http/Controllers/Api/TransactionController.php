@@ -216,6 +216,50 @@ class TransactionController extends Controller
         ]);
     }
 
+    public function cancel(Request $request, string $id)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'reason' => 'required|string|max:255',
+        ]);
+
+        $transaction = Transaction::find($id);
+        if (!$transaction) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Transaction not found'
+            ], 404);
+        }
+
+        // Only owner or admin can cancel
+        if ($user->role !== 'admin' && $transaction->user_id !== $user->id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        // Can only cancel if pending
+        if ($transaction->status !== 'pending') {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Only pending transactions can be cancelled'
+            ], 400);
+        }
+
+        $transaction->update([
+            'status' => 'cancelled',
+            'cancellation_reason' => $request->reason
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Transaction cancelled',
+            'data' => $transaction->fresh(['service', 'cleaner'])
+        ]);
+    }
+
     public function rate(Request $request, string $id)
     {
         $user = $request->user();
