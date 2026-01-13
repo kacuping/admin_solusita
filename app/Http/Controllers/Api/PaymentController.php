@@ -39,6 +39,7 @@ class PaymentController extends Controller
             'address' => 'required|string|max:255',
             'latitude' => 'nullable|numeric',
             'longitude' => 'nullable|numeric',
+            'quantity' => 'nullable|integer|min:1',
         ]);
 
         try {
@@ -46,6 +47,8 @@ class PaymentController extends Controller
 
             $service = Service::findOrFail($request->service_id);
             $user = $request->user();
+            $quantity = $request->input('quantity', 1);
+            $total = $service->price * $quantity;
 
             // Create Transaction
             $code = 'TRX-' . mt_rand(100000, 999999);
@@ -58,7 +61,8 @@ class PaymentController extends Controller
                 'order_address' => $request->address,
                 'order_lat' => $request->latitude,
                 'order_lng' => $request->longitude,
-                'total' => $service->price,
+                'quantity' => $quantity,
+                'total' => $total,
                 'status' => 'pending',
             ]);
 
@@ -121,7 +125,7 @@ class PaymentController extends Controller
                         [
                             'id' => $service->id,
                             'price' => (int) $service->price,
-                            'quantity' => 1,
+                            'quantity' => (int) $quantity,
                             'name' => $service->name,
                         ]
                     ],

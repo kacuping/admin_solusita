@@ -214,6 +214,10 @@
                                 <td id="detail-service"></td>
                             </tr>
                             <tr>
+                                <th>Jumlah / Luas</th>
+                                <td id="detail-quantity"></td>
+                            </tr>
+                            <tr>
                                 <th>Status</th>
                                 <td id="detail-status"></td>
                             </tr>
@@ -266,7 +270,8 @@
                                 <th>Bukti Transfer</th>
                                 <td>
                                     <a href="#" id="link-payment-proof" target="_blank">
-                                        <img id="img-payment-proof" src="" alt="Bukti Transfer" style="max-width: 200px; max-height: 200px;" class="img-thumbnail">
+                                        <img id="img-payment-proof" src="" alt="Bukti Transfer"
+                                            style="max-width: 200px; max-height: 200px;" class="img-thumbnail">
                                     </a>
                                 </td>
                             </tr>
@@ -274,7 +279,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success" id="btn-complete-trx" style="display:none;">Selesaikan Transaksi</button>
+                    <button type="button" class="btn btn-success" id="btn-complete-trx"
+                        style="display:none;">Selesaikan Transaksi</button>
                     <button type="button" class="btn btn-danger" id="btn-cancel-trx" style="display:none;">Batalkan
                         Transaksi</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
@@ -338,6 +344,11 @@
                         $('#detail-service').text(response.service ? response.service.name :
                             '-');
 
+                        // Quantity Info
+                        let unit = response.service ? response.service.unit : 'Unit';
+                        let qty = response.quantity ? response.quantity : 1;
+                        $('#detail-quantity').text(qty + ' ' + unit);
+
                         let statusLabel = response.status.charAt(0).toUpperCase() + response
                             .status.slice(1);
                         $('#detail-status').text(statusLabel);
@@ -345,7 +356,8 @@
                             response.total));
 
                         // Payment Info
-                        let paymentType = response.payment_type ? response.payment_type.toUpperCase() : '-';
+                        let paymentType = response.payment_type ? response.payment_type
+                            .toUpperCase() : '-';
                         if (paymentType === 'BRI_VA') paymentType = 'BRI Virtual Account';
                         $('#detail-payment-type').text(paymentType);
 
@@ -358,10 +370,11 @@
                             $('#row-payment-proof').hide();
                         }
 
-                        $('#detail-address').text(response.order_address ? response.order_address : '-');
-                        let coords = (response.order_lat && response.order_lng)
-                            ? `${response.order_lat}, ${response.order_lng}`
-                            : '-';
+                        $('#detail-address').text(response.order_address ? response
+                            .order_address : '-');
+                        let coords = (response.order_lat && response.order_lng) ?
+                            `${response.order_lat}, ${response.order_lng}` :
+                            '-';
                         $('#detail-coords').text(coords);
 
                         // Cancellation Info
@@ -369,7 +382,7 @@
                             $('#row-cancellation-reason').show();
                             let reason = response.cancellation_reason || '-';
                             $('#detail-cancellation-reason').text(reason);
-                            
+
                             // Adjust status label based on reason
                             if (reason.includes('User Cancelled')) {
                                 $('#detail-status').text('User Cancelled');
@@ -455,7 +468,8 @@
                     cancelButtonText: 'Batal'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        var url = "{{ route('transaksi.complete', ':id') }}".replace(':id', currentTransactionId);
+                        var url = "{{ route('transaksi.complete', ':id') }}".replace(':id',
+                            currentTransactionId);
 
                         $.ajax({
                             url: url,
@@ -475,7 +489,7 @@
                             },
                             error: function(xhr) {
                                 var msg = 'Gagal menyelesaikan transaksi';
-                                if(xhr.responseJSON && xhr.responseJSON.error) {
+                                if (xhr.responseJSON && xhr.responseJSON.error) {
                                     msg = xhr.responseJSON.error;
                                 }
                                 Swal.fire('Error', msg, 'error');
