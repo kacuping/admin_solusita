@@ -23,6 +23,7 @@
               <th>Email</th>
               <th>Alamat</th>
               <th>No HP</th>
+              <th>Status Notif</th>
               <th>Aksi</th>
             </tr>
           </thead>
@@ -42,6 +43,13 @@
                 <td>{{ $customer->address }}</td>
                 <td>{{ $customer->phone }}</td>
                 <td>
+                    @if($customer->device_token)
+                        <span class="badge badge-success">Terhubung</span>
+                    @else
+                        <span class="badge badge-secondary">Belum Terhubung</span>
+                    @endif
+                </td>
+                <td>
                   <a href="{{ route('users.pelanggan.edit', $customer) }}" class="btn btn-sm btn-warning">Edit</a>
                   <form action="{{ route('users.pelanggan.destroy', $customer) }}" method="POST" style="display:inline-block" class="delete-form">
                     @csrf
@@ -52,7 +60,7 @@
               </tr>
             @empty
               <tr>
-                <td colspan="7" class="text-center">Belum ada pelanggan</td>
+                <td colspan="8" class="text-center">Belum ada pelanggan</td>
               </tr>
             @endforelse
           </tbody>
