@@ -157,13 +157,20 @@ class UserController extends Controller
 
     public function saveDeviceToken(Request $request)
     {
-        $request->validate([
-            'device_token' => 'required|string'
-        ]);
+        // Support both 'token' (from frontend) and 'device_token' naming
+        $token = $request->input('token') ?? $request->input('device_token');
+
+        if (!$token) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Token is required',
+                'errors' => ['token' => ['The token field is required.']]
+            ], 422);
+        }
 
         $user = $request->user();
         $user->update([
-            'device_token' => $request->device_token
+            'device_token' => $token
         ]);
 
         return response()->json([
