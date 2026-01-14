@@ -7,9 +7,17 @@ use App\Models\User;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Services\FcmService;
 
 class TransactionController extends Controller
 {
+    protected $fcmService;
+
+    public function __construct(FcmService $fcmService)
+    {
+        $this->fcmService = $fcmService;
+    }
+
     public function index(Request $request)
     {
         // Auto-cancel logic for pending/process transactions older than today
@@ -78,6 +86,23 @@ class TransactionController extends Controller
             'status' => 'process'
         ]);
         
+        // Load relationships needed for notification
+        $transaction->load(['user', 'cleaner']);
+
+        // Send Notification
+        if ($transaction->user && $transaction->user->device_token) {
+            $this->fcmService->sendToToken(
+                $transaction->user->device_token,
+                'Pesanan Diproses',
+                'Cleaner ' . ($transaction->cleaner->name ?? 'Petugas') . ' telah ditugaskan untuk pesanan Anda.',
+                [
+                    'transaction_id' => (string) $transaction->id,
+                    'status' => 'process',
+                    'type' => 'transaction_update'
+                ]
+            );
+        }
+        
         return response()->json(['success' => true]);
     }
 
@@ -90,6 +115,20 @@ class TransactionController extends Controller
         $transaction->update([
             'status' => 'completed'
         ]);
+
+        // Send Notification
+        if ($transaction->user && $transaction->user->device_token) {
+            $this->fcmService->sendToToken(
+                $transaction->user->device_token,
+                'Pesanan Selesai',
+                'Pesanan Anda telah selesai dikerjakan. Terima kasih!',
+                [
+                    'transaction_id' => (string) $transaction->id,
+                    'status' => 'completed',
+                    'type' => 'transaction_update'
+                ]
+            );
+        }
         
         return response()->json(['success' => true]);
     }
@@ -108,6 +147,20 @@ class TransactionController extends Controller
             'status' => 'cancelled',
             'cancellation_reason' => 'Admin Cancelled: ' . $request->reason
         ]);
+
+        // Send Notification
+        if ($transaction->user && $transaction->user->device_token) {
+            $this->fcmService->sendToToken(
+                $transaction->user->device_token,
+                'Pesanan Dibatalkan',
+                'Pesanan Anda dibatalkan oleh admin. Alasan: ' . $request->reason,
+                [
+                    'transaction_id' => (string) $transaction->id,
+                    'status' => 'cancelled',
+                    'type' => 'transaction_update'
+                ]
+            );
+        }
         
         return response()->json(['success' => true]);
     }
