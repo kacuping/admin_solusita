@@ -50,5 +50,6 @@ Route::middleware('auth')->group(function () {
         ->names('payment-methods');
 
     Route::get('/settings', [App\Http\Controllers\SettingController::class, 'index'])->name('settings.index');
+    Route::post('/settings/test-notification', [App\Http\Controllers\SettingController::class, 'sendTestNotification'])->name('settings.test-notification');
 });
 
